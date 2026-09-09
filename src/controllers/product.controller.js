@@ -4,46 +4,26 @@ import prisma from '../config/prisma.js';
  * Obtener todos los productos con filtros avanzados
  * GET /api/products?categoryId=1&minPrice=10000&maxPrice=50000&inStock=true
  */
+
 export const getAllProducts = async (req, res, next) => {
   try {
-    const { categoryId, minPrice, maxPrice, inStock } = req.query;
+    const { brandId } = req.query;
 
     const where = {};
-
-    if (categoryId !== undefined) {
-      where.categoryId = Number(categoryId);
-    }
-
-    if (minPrice !== undefined || maxPrice !== undefined) {
-      where.price = {};
-      if (minPrice !== undefined) where.price.gte = Number(minPrice);
-      if (maxPrice !== undefined) where.price.lte = Number(maxPrice);
-    }
-
-    if (inStock !== undefined) {
-      const onlyInStock = inStock === true || inStock === 'true';
-      where.stock = onlyInStock ? { gt: 0 } : 0;
+    if (brandId) {
+      where.brandId = Number(brandId);
     }
 
     const products = await prisma.product.findMany({
       where,
       include: {
-        category: {
-          select: {
-            id: true,
-            name: true
-          }
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
+        category: true,
+        brand: true,
+        _count: { select: { reviews: true } }
       }
     });
 
-    res.status(200).json({
-      total: products.length,
-      data: products
-    });
+    return res.json(products);
   } catch (error) {
     next(error);
   }

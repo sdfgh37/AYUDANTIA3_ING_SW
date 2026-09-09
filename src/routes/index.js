@@ -9,12 +9,13 @@ apiRouter.get('/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
     timestamp: new Date().toISOString(),
-    service: 'TechStore API (Productos y Categorías)'
+    service: 'TechStore API (Productos, Categorías, Marcas y Reseñas)'
   });
 });
 
 // Enrutadores modulares
 apiRouter.use('/categories', categoryRoutes);
 apiRouter.use('/products', productRoutes);
-
+router.use('/brands', brandRoutes);
+router.use('/products', reviewRoutes);
 export default apiRouter;
